@@ -23,22 +23,22 @@
       <td><a href="https://github.com/Igorxst/Yandex-Praktikum/blob/main/4.%20%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%20%D1%80%D1%8B%D0%BD%D0%BA%D0%B0%20%D0%B7%D0%B0%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B9%20%D0%BE%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE%20%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D1%8B.ipynb" target="_blank">Анализ рынка заведений общественного питания Москвы</a></td>
       <td>нвесторы из фонда «Shut Up and Take My Money» решили попробовать себя в новой области и открыть заведение общественного питания в Москве. Заказчики ещё не знают, что это будет за место: кафе, ресторан, пиццерия, паб или бар, — и какими будут расположение, меню и цены.
 Для начала они просят вас — аналитика — подготовить исследование рынка Москвы, найти интересные особенности и презентовать полученные результаты, которые в будущем помогут в выборе подходящего инвесторам места.</td>
-      <td>pandas,numpy,seaborn,matplotlib.pyplot,plotly.express,folium </td>
+      <td><b>pandas</b>,<b>numpy</b>,<b>seaborn</b>,<b>matplotlib.pyplot</b>,<b>plotly.express</b>,<b>folium</b> </td>
     </tr>
     <tr>
       <td><a href="https://github.com/Igorxst/Yandex-Praktikum/blob/main/5.%20%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85%20%D0%AF%D0%BD%D0%B4%D0%B5%D0%BA%D1%81%20%D0%BD%D0%B5%D0%B4%D0%B2%D0%B8%D0%B6%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C.ipynb" target="_blank">Анализ данных Яндекс недвижимость</a></td>
       <td>Определение рыночной стоимости объектов недвижимости (на базе данных ресурса Яндекс.Недвижимость). Задача — установить параметры, которые в той или иной степени оказывают влиение на финальную стоимость. Это позволит построить автоматизированную систему: она отследит аномалии и мошенническую деятельность.</td>
-      <td>>pandas,numpy,seaborn,matplotlib.pyplot,plotly.express,datetime </td>
+      <td><b>pandas</b>,<b>numpy</b>,<b>seaborn</b>,<b>matplotlib.pyplot</b>,<b>plotly.express</b>,<b>datetime</b> </td>
     </tr>
     <tr>
       <td><a href="https://github.com/Igorxst/Yandex-Praktikum/blob/main/6.%20%D0%98%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D1%83%D1%80%D0%BE%D0%B2%D0%BD%D1%8F%20NPS%20%D1%82%D0%B5%D0%BB%D0%B5%D0%BA%D0%BE%D0%BC%D0%BC%D1%83%D0%BD%D0%B8%D0%BA%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D0%BE%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8.ipynb" target="_blank">Исследования уровня NPS телекоммуникационной компании </a> </td>
       <td>Заказчик этого исследования — большая телекоммуникационная компания, которая оказывает услуги на территории всего СНГ. Перед компанией стоит задача определить текущий уровень потребительской лояльности, или NPS (от англ. Net Promoter Score), среди клиентов из России. </td>
-      <td>os,pandas,numpy,sqlalchemy, tableau</td>
+      <td><b>os</b>,<b>pandas</b>,<b>numpy</b>,<b>sqlalchemy</b>, <b>tableau</b></td>
     </tr>
     <tr>
 <td><a href="https://github.com/Igorxst/Yandex-Praktikum/blob/main/7.%20%D0%90%D0%BD%D0%B0%D0%BB%D0%B8%D0%B7%20%D1%83%D1%81%D0%BF%D0%B5%D1%88%D0%BD%D0%BE%D1%81%D1%82%D0%B8%20%D0%BC%D0%B0%D1%80%D0%BA%D0%B5%D1%82%D0%B8%D0%BD%D0%B3%D0%BE%D0%B2%D0%BE%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BF%D0%B0%D0%BD%D0%B8%D0%B8%20.ipynb" target="_blank"> Анализ успешности маркетинговой компании</a> </td>
       <td>Вы — маркетинговый аналитик развлекательного приложения Procrastinate Pro+. Несмотря на огромные вложения в рекламу, последние несколько месяцев компания терпит убытки. Ваша задача — разобраться в причинах и помочь компании выйти в плюс.</td>
-      <td>pandas,matplotlib.pyplot,plotly.express,plotly.graph_objects,plotly.subplots ,numpy,datetime</td>
+      <td><b>pandas</b>,<b>matplotlib.pyplot</b>,<b>plotly.express</b>,<b>plotly.graph_objects</b>,<b>plotly.subplots</b> ,<b>numpy</b>,<b>datetime</b></td>
     </tr>
   </tbody>
 </table>
