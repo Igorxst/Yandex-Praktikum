@@ -3,12 +3,12 @@
 <table>
   <tbody>
     <tr>
-      <th>Volkswagen AG</th>
+      <th>Проект</th>
       <th>Daimler AG</th>
       <th>BMW Group</th>
     </tr>
     <tr>
-      <td>Audi</td>
+      <td>Описание проекта</td>
       <td>Mercedes-Benz</td>
       <td>BMW</td>
     </tr>
