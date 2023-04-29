@@ -4,8 +4,8 @@
   <tbody>
     <tr>
       <th>Проект</th>
-      <th>Daimler AG</th>
-      <th>BMW Group</th>
+      <th>Описание проекта</th>
+      <th>Используемые библиотеки</th>
     </tr>
     <tr>
       <td>Описание проекта</td>
