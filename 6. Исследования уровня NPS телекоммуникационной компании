@@ -1,0 +1,829 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "6f53b6d8",
+   "metadata": {},
+   "source": [
+    "# Исследования уровня NPS телекоммуникационной компании\n",
+    "\n",
+    "\n",
+    "Заказчик этого исследования — большая телекоммуникационная компания, которая оказывает услуги на территории всего СНГ. Перед компанией стоит задача определить текущий уровень потребительской лояльности, или NPS (от англ. Net Promoter Score), среди клиентов из России. \n",
+    "Чтобы определить уровень лояльности, клиентам задавали классический вопрос: «Оцените по шкале от 1 до 10 вероятность того, что вы порекомендуете компанию друзьям и знакомым».\n",
+    "Компания провела опрос и попросила вас подготовить дашборд с его итогами.\n",
+    "Чтобы оценить результаты опроса, оценки разделим на три группы:\n",
+    "* 9-10 баллов — «cторонники» (англ. promoters);\n",
+    "* 7-8 баллов — «нейтралы» (англ. passives);\n",
+    "* 0-6 баллов — «критики» (англ. detractors).\n",
+    "\n",
+    "\n",
+    "Итоговое значение NPS рассчитывается по формуле: % «сторонников» - % «критиков».\n",
+    "\n",
+    "**Цель исследования:**\n",
+    "\n",
+    "Определение текущего уровня потребительской лояльности или NPS среди клиентов из России\n",
+    "\n",
+    "\n",
+    "\n",
+    "***На дашборд :*** https://public.tableau.com/app/profile/igor.plekhov/viz/Project2_16795330095340/ProjectDashboard\n",
+    "    \n",
+    "    \n",
+    "***На яндекс диск:***https://disk.yandex.ru/d/MbuML_kGjgaS0w\n",
+    "    \n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "fc7efa54",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "\n",
+    "from sqlalchemy import create_engine"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "0017f8e7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "path_to_db_local = 'telecomm_csi.db'\n",
+    "path_to_db_platform = '/datasets/telecomm_csi.db'\n",
+    "path_to_db = None\n",
+    "\n",
+    "if os.path.exists(path_to_db_local):\n",
+    "    path_to_db = path_to_db_platform\n",
+    "elif os.path.exists(path_to_db_platform):\n",
+    "    path_to_db = path_to_db_platform\n",
+    "else:\n",
+    "    raise Exception('Файл с базой данных SQLite не найден!')\n",
+    "\n",
+    "if path_to_db:\n",
+    "    engine = create_engine(f'sqlite:///{path_to_db}', echo=False)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "84ebad43",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "query = \"\"\"\n",
+    "        WITH\n",
+    "        \n",
+    "        u AS (SELECT *\n",
+    "              FROM user),\n",
+    "                 \n",
+    "        loc AS (SELECT location_id,\n",
+    "                       country,\n",
+    "                       city\n",
+    "                FROM location),         \n",
+    "                 \n",
+    "        a AS (SELECT SUBSTR(title,3,10) AS  age_segment,\n",
+    "                     age_gr_id\n",
+    "              FROM age_segment),\n",
+    "                \n",
+    "                \n",
+    "        tr AS (SELECT SUBSTR(title,3,10) AS traffic_segment,\n",
+    "                      tr_gr_id\n",
+    "               FROM traffic_segment),\n",
+    "            \n",
+    "        lt AS (SELECT SUBSTR(title,3,10) AS  lifetime_segment,\n",
+    "                      lt_gr_id\n",
+    "               FROM lifetime_segment)\n",
+    "        \n",
+    "        SELECT u.user_id,\n",
+    "               u.lt_day,\n",
+    "               u.age,\n",
+    "               u.gender_segment,\n",
+    "               u.os_name,\n",
+    "               u.cpe_type_name,\n",
+    "               loc.country,\n",
+    "               loc.city,\n",
+    "               a.age_segment,\n",
+    "               tr.traffic_segment,\n",
+    "               lt.lifetime_segment,\n",
+    "               u.nps_score,\n",
+    "               CASE\n",
+    "                   WHEN u.nps_score >= 9 THEN 'cторонники'\n",
+    "                   WHEN u.nps_score < 9 AND u.nps_score >=7  THEN 'нейтралы'\n",
+    "                   WHEN u.nps_score <= 6 THEN 'критики'\n",
+    "               END AS nps_group\n",
+    "               \n",
+    "               \n",
+    "\n",
+    "        FROM u\n",
+    "        JOIN loc ON u.location_id = loc.location_id\n",
+    "        JOIN a ON u.age_gr_id = a.age_gr_id\n",
+    "        JOIN tr ON u.tr_gr_id = tr.tr_gr_id\n",
+    "        JOIN lt ON u.lt_gr_id = lt.lt_gr_id                 \n",
+    "\"\"\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "3965faf2",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>user_id</th>\n",
+       "      <th>lt_day</th>\n",
+       "      <th>age</th>\n",
+       "      <th>gender_segment</th>\n",
+       "      <th>os_name</th>\n",
+       "      <th>cpe_type_name</th>\n",
+       "      <th>country</th>\n",
+       "      <th>city</th>\n",
+       "      <th>age_segment</th>\n",
+       "      <th>traffic_segment</th>\n",
+       "      <th>lifetime_segment</th>\n",
+       "      <th>nps_score</th>\n",
+       "      <th>nps_group</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>A001A2</td>\n",
+       "      <td>2320</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Уфа</td>\n",
+       "      <td>45-54</td>\n",
+       "      <td>1-5</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>A001WF</td>\n",
+       "      <td>2344</td>\n",
+       "      <td>53.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Киров</td>\n",
+       "      <td>45-54</td>\n",
+       "      <td>1-5</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>A003Q7</td>\n",
+       "      <td>467</td>\n",
+       "      <td>57.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Москва</td>\n",
+       "      <td>55-64</td>\n",
+       "      <td>20-25</td>\n",
+       "      <td>13-24</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>A004TB</td>\n",
+       "      <td>4190</td>\n",
+       "      <td>44.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>IOS</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>РостовнаДону</td>\n",
+       "      <td>35-44</td>\n",
+       "      <td>0.1-1</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>A004XT</td>\n",
+       "      <td>1163</td>\n",
+       "      <td>24.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Рязань</td>\n",
+       "      <td>16-24</td>\n",
+       "      <td>5-10</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>A005O0</td>\n",
+       "      <td>5501</td>\n",
+       "      <td>42.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Омск</td>\n",
+       "      <td>35-44</td>\n",
+       "      <td>5-10</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>6</td>\n",
+       "      <td>критики</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>A0061R</td>\n",
+       "      <td>1236</td>\n",
+       "      <td>45.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Уфа</td>\n",
+       "      <td>45-54</td>\n",
+       "      <td>10-15</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>A009KS</td>\n",
+       "      <td>313</td>\n",
+       "      <td>35.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Москва</td>\n",
+       "      <td>35-44</td>\n",
+       "      <td>45-50</td>\n",
+       "      <td>7-12</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>A00AES</td>\n",
+       "      <td>3238</td>\n",
+       "      <td>36.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>СанктПетербург</td>\n",
+       "      <td>35-44</td>\n",
+       "      <td>1-5</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>10</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>A00F70</td>\n",
+       "      <td>4479</td>\n",
+       "      <td>54.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>ANDROID</td>\n",
+       "      <td>SMARTPHONE</td>\n",
+       "      <td>Россия</td>\n",
+       "      <td>Волгоград</td>\n",
+       "      <td>45-54</td>\n",
+       "      <td>15-20</td>\n",
+       "      <td>36+</td>\n",
+       "      <td>9</td>\n",
+       "      <td>cторонники</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  user_id  lt_day   age  gender_segment  os_name cpe_type_name country  \\\n",
+       "0  A001A2    2320  45.0             1.0  ANDROID    SMARTPHONE  Россия   \n",
+       "1  A001WF    2344  53.0             0.0  ANDROID    SMARTPHONE  Россия   \n",
+       "2  A003Q7     467  57.0             0.0  ANDROID    SMARTPHONE  Россия   \n",
+       "3  A004TB    4190  44.0             1.0      IOS    SMARTPHONE  Россия   \n",
+       "4  A004XT    1163  24.0             0.0  ANDROID    SMARTPHONE  Россия   \n",
+       "5  A005O0    5501  42.0             1.0  ANDROID    SMARTPHONE  Россия   \n",
+       "6  A0061R    1236  45.0             0.0  ANDROID    SMARTPHONE  Россия   \n",
+       "7  A009KS     313  35.0             0.0  ANDROID    SMARTPHONE  Россия   \n",
+       "8  A00AES    3238  36.0             1.0  ANDROID    SMARTPHONE  Россия   \n",
+       "9  A00F70    4479  54.0             1.0  ANDROID    SMARTPHONE  Россия   \n",
+       "\n",
+       "             city age_segment traffic_segment lifetime_segment  nps_score  \\\n",
+       "0             Уфа       45-54             1-5              36+         10   \n",
+       "1           Киров       45-54             1-5              36+         10   \n",
+       "2          Москва       55-64           20-25            13-24         10   \n",
+       "3    РостовнаДону       35-44           0.1-1              36+         10   \n",
+       "4          Рязань       16-24            5-10              36+         10   \n",
+       "5            Омск       35-44            5-10              36+          6   \n",
+       "6             Уфа       45-54           10-15              36+         10   \n",
+       "7          Москва       35-44           45-50             7-12         10   \n",
+       "8  СанктПетербург       35-44             1-5              36+         10   \n",
+       "9       Волгоград       45-54           15-20              36+          9   \n",
+       "\n",
+       "    nps_group  \n",
+       "0  cторонники  \n",
+       "1  cторонники  \n",
+       "2  cторонники  \n",
+       "3  cторонники  \n",
+       "4  cторонники  \n",
+       "5     критики  \n",
+       "6  cторонники  \n",
+       "7  cторонники  \n",
+       "8  cторонники  \n",
+       "9  cторонники  "
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_sql(query, engine)\n",
+    "df.head(10)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e79e9a34",
+   "metadata": {},
+   "source": [
+    "<div class=\"alert alert-success\">\n",
+    "<font size=\"5\"><b>Комментарий ревьюера</b></font>\n",
+    "\n",
+    "Успех: Запрос классный. Все сделано детально, таблицы соединены корректно. Здорово, что ты знаешь метод substring. Он позволяет нам убрать лишние цифры в некоторых параметрах. Однако это лишь рекомендация. \n",
+    "\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "e6e9d854",
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 502493 entries, 0 to 502492\n",
+      "Data columns (total 13 columns):\n",
+      " #   Column            Non-Null Count   Dtype  \n",
+      "---  ------            --------------   -----  \n",
+      " 0   user_id           502493 non-null  object \n",
+      " 1   lt_day            502493 non-null  int64  \n",
+      " 2   age               501939 non-null  float64\n",
+      " 3   gender_segment    501192 non-null  float64\n",
+      " 4   os_name           502493 non-null  object \n",
+      " 5   cpe_type_name     502493 non-null  object \n",
+      " 6   country           502493 non-null  object \n",
+      " 7   city              502493 non-null  object \n",
+      " 8   age_segment       502493 non-null  object \n",
+      " 9   traffic_segment   502493 non-null  object \n",
+      " 10  lifetime_segment  502493 non-null  object \n",
+      " 11  nps_score         502493 non-null  int64  \n",
+      " 12  nps_group         502493 non-null  object \n",
+      "dtypes: float64(2), int64(2), object(9)\n",
+      "memory usage: 49.8+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "9db04858",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df.to_csv('telecomm_csi_tableau.csv', index=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "511ce484",
+   "metadata": {},
+   "source": [
+    "***На дашборд :*** https://public.tableau.com/app/profile/igor.plekhov/viz/Project2_16795330095340/ProjectDashboard "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "621589a2",
+   "metadata": {},
+   "source": [
+    "***На яндекс диск:***https://disk.yandex.ru/d/MbuML_kGjgaS0w"
+   ]
+  }
+ ],
+ "metadata": {
+  "ExecuteTimeLog": [
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T11:44:36.810Z"
+   },
+   {
+    "duration": 54,
+    "start_time": "2023-03-22T11:44:37.397Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T11:44:37.886Z"
+   },
+   {
+    "duration": 513,
+    "start_time": "2023-03-22T11:44:38.492Z"
+   },
+   {
+    "duration": 452,
+    "start_time": "2023-03-22T11:44:52.515Z"
+   },
+   {
+    "duration": 11,
+    "start_time": "2023-03-22T11:45:10.718Z"
+   },
+   {
+    "duration": 448,
+    "start_time": "2023-03-22T11:45:27.390Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-22T11:50:48.087Z"
+   },
+   {
+    "duration": 462,
+    "start_time": "2023-03-22T11:50:48.707Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-22T11:52:28.243Z"
+   },
+   {
+    "duration": 465,
+    "start_time": "2023-03-22T11:52:29.100Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-22T12:07:56.624Z"
+   },
+   {
+    "duration": 469,
+    "start_time": "2023-03-22T12:08:01.082Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:09:57.211Z"
+   },
+   {
+    "duration": 499,
+    "start_time": "2023-03-22T12:09:57.727Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:13:13.356Z"
+   },
+   {
+    "duration": 496,
+    "start_time": "2023-03-22T12:13:14.425Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:32:31.120Z"
+   },
+   {
+    "duration": 562,
+    "start_time": "2023-03-22T12:32:31.772Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:33:50.144Z"
+   },
+   {
+    "duration": 510,
+    "start_time": "2023-03-22T12:33:50.595Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:34:07.604Z"
+   },
+   {
+    "duration": 510,
+    "start_time": "2023-03-22T12:34:07.996Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:35:38.716Z"
+   },
+   {
+    "duration": 638,
+    "start_time": "2023-03-22T12:35:39.316Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:36:04.987Z"
+   },
+   {
+    "duration": 504,
+    "start_time": "2023-03-22T12:36:05.588Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T12:37:25.672Z"
+   },
+   {
+    "duration": 3614,
+    "start_time": "2023-03-22T12:37:26.540Z"
+   },
+   {
+    "duration": 13,
+    "start_time": "2023-03-22T17:55:00.678Z"
+   },
+   {
+    "duration": 66,
+    "start_time": "2023-03-22T17:55:01.315Z"
+   },
+   {
+    "duration": 666,
+    "start_time": "2023-03-22T17:55:05.316Z"
+   },
+   {
+    "duration": 321,
+    "start_time": "2023-03-22T17:55:05.985Z"
+   },
+   {
+    "duration": 7,
+    "start_time": "2023-03-22T17:55:06.308Z"
+   },
+   {
+    "duration": 5788,
+    "start_time": "2023-03-22T17:55:06.429Z"
+   },
+   {
+    "duration": 280,
+    "start_time": "2023-03-22T17:55:12.219Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T17:56:05.319Z"
+   },
+   {
+    "duration": 832,
+    "start_time": "2023-03-22T17:56:05.781Z"
+   },
+   {
+    "duration": 4,
+    "start_time": "2023-03-22T17:56:14.309Z"
+   },
+   {
+    "duration": 4789,
+    "start_time": "2023-03-22T17:56:16.094Z"
+   },
+   {
+    "duration": 5,
+    "start_time": "2023-03-22T18:03:33.073Z"
+   },
+   {
+    "duration": 514,
+    "start_time": "2023-03-22T18:03:33.525Z"
+   },
+   {
+    "duration": 6,
+    "start_time": "2023-03-22T18:03:43.775Z"
+   },
+   {
+    "duration": 6575,
+    "start_time": "2023-03-22T18:03:44.141Z"
+   },
+   {
+    "duration": 5,
+    "start_time": "2023-03-22T18:05:17.371Z"
+   },
+   {
+    "duration": 6012,
+    "start_time": "2023-03-22T18:05:17.721Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T18:08:29.315Z"
+   },
+   {
+    "duration": 613,
+    "start_time": "2023-03-22T18:08:29.910Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-22T18:09:22.518Z"
+   },
+   {
+    "duration": 570,
+    "start_time": "2023-03-22T18:09:22.869Z"
+   },
+   {
+    "duration": 13,
+    "start_time": "2023-03-22T18:09:46.076Z"
+   },
+   {
+    "duration": 6224,
+    "start_time": "2023-03-22T18:09:46.527Z"
+   },
+   {
+    "duration": 549,
+    "start_time": "2023-03-22T18:10:12.139Z"
+   },
+   {
+    "duration": 6695,
+    "start_time": "2023-03-22T18:11:31.167Z"
+   },
+   {
+    "duration": 651,
+    "start_time": "2023-03-24T12:15:35.090Z"
+   },
+   {
+    "duration": 173,
+    "start_time": "2023-03-24T12:15:35.748Z"
+   },
+   {
+    "duration": 4,
+    "start_time": "2023-03-24T12:15:35.923Z"
+   },
+   {
+    "duration": 576,
+    "start_time": "2023-03-25T16:47:15.864Z"
+   },
+   {
+    "duration": 89,
+    "start_time": "2023-03-25T16:47:16.442Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-25T16:47:16.533Z"
+   },
+   {
+    "duration": 404,
+    "start_time": "2023-03-25T16:47:16.711Z"
+   },
+   {
+    "duration": 0,
+    "start_time": "2023-03-25T16:47:17.116Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-25T16:47:33.567Z"
+   },
+   {
+    "duration": 5246,
+    "start_time": "2023-03-25T16:47:33.884Z"
+   },
+   {
+    "duration": 455,
+    "start_time": "2023-03-25T16:47:39.132Z"
+   },
+   {
+    "duration": 3883,
+    "start_time": "2023-03-25T16:47:39.589Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-25T16:52:08.632Z"
+   },
+   {
+    "duration": 437,
+    "start_time": "2023-03-25T16:52:09.416Z"
+   },
+   {
+    "duration": 3,
+    "start_time": "2023-03-25T16:52:19.399Z"
+   },
+   {
+    "duration": 435,
+    "start_time": "2023-03-25T16:52:19.600Z"
+   },
+   {
+    "duration": 2,
+    "start_time": "2023-03-25T16:52:27.900Z"
+   },
+   {
+    "duration": 435,
+    "start_time": "2023-03-25T16:52:29.031Z"
+   },
+   {
+    "duration": 5,
+    "start_time": "2023-03-25T16:53:24.201Z"
+   },
+   {
+    "duration": 358,
+    "start_time": "2023-03-25T16:53:24.792Z"
+   },
+   {
+    "duration": 4,
+    "start_time": "2023-03-25T16:53:34.492Z"
+   },
+   {
+    "duration": 4790,
+    "start_time": "2023-03-25T16:53:34.743Z"
+   },
+   {
+    "duration": 553,
+    "start_time": "2023-03-27T16:33:26.425Z"
+   },
+   {
+    "duration": 24,
+    "start_time": "2023-03-27T16:33:26.980Z"
+   },
+   {
+    "duration": 5,
+    "start_time": "2023-03-27T16:33:27.005Z"
+   },
+   {
+    "duration": 6086,
+    "start_time": "2023-03-27T16:33:27.011Z"
+   },
+   {
+    "duration": 517,
+    "start_time": "2023-03-27T16:33:33.099Z"
+   },
+   {
+    "duration": 3884,
+    "start_time": "2023-03-27T16:33:33.618Z"
+   }
+  ],
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.9.5"
+  },
+  "toc": {
+   "base_numbering": 1,
+   "nav_menu": {},
+   "number_sections": true,
+   "sideBar": true,
+   "skip_h1_title": true,
+   "title_cell": "Table of Contents",
+   "title_sidebar": "Contents",
+   "toc_cell": false,
+   "toc_position": {},
+   "toc_section_display": true,
+   "toc_window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
