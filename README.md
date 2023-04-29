@@ -3,8 +3,8 @@
 <table>
  <table border="1" width="100%">
 	<col style="width:40%">
-	<col style="width:30%">
-	<col style="width:30%">
+	<col style="width:50%">
+	<col style="width:10%">
   <tbody>
     <tr>
       <th>Проект</th>
