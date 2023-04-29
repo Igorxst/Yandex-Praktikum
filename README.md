@@ -6,20 +6,32 @@
       <th>Проект</th>
       <th>Описание проекта</th>
       <th>Используемые библиотеки</th>
+      <th>Используемые библиотеки</th>
+      <th>Используемые библиотеки</th>
+      <th>Используемые библиотеки</th>
     </tr>
     <tr>
       <td>Описание проекта</td>
       <td>Mercedes-Benz</td>
+      <td>BMW</td>
+      <td>BMW</td>
+      <td>BMW</td>
       <td>BMW</td>
     </tr>
     <tr>
       <td>Skoda</td>
       <td>Mercedes-AMG</td>
       <td>Mini</td>
+      <td>Mini</td>
+      <td>Mini</td>
+      <td>Mini</td>
     </tr>
     <tr>
       <td>Lamborghini</td>
       <td>Smart</td>
+      <td>Rolls-Royce</td>
+      <td>Rolls-Royce</td>
+      <td>Rolls-Royce</td>
       <td>Rolls-Royce</td>
     </tr>
   </tbody>
