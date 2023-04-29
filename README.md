@@ -1,6 +1,10 @@
 # Yandex-Praktikum
 Проекты сделанный в процессе обучения на курсе "Аналитик данных плюс" Яндекс Практикум
 <table>
+ <table border="1" width="100%">
+	<col style="width:40%">
+	<col style="width:30%">
+	<col style="width:30%">
   <tbody>
     <tr>
       <th>Проект</th>
