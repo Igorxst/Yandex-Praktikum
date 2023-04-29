@@ -28,12 +28,12 @@
       <td>test</td>
     </tr>
     <tr>
-      <td> test</td>
+      <td> Исследования уровня NPS телекоммуникационной компании <a href="https://daniilshat.ru/" target="_blank">Daniil</a> </td>
       <td>tesst</td>
       <td>test</td>
     </tr>
     <tr>
-      <td> test</td>
+      <td> Анализ успешности маркетинговой компании </td>
       <td>tesst</td>
       <td>test</td>
     </tr>
