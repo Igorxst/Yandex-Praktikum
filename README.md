@@ -22,5 +22,10 @@
       <td>Smart</td>
       <td>Rolls-Royce</td>
     </tr>
+    <tr>
+      <tf>Анализ рынка заведений общественного питания Москвы</td>
+      <tf>Smart</td>
+      <tf>Rolls-Royce</td>
+    </tr>
   </tbody>
 </table>
