@@ -5,7 +5,6 @@
 	<col style="width:40%">
 	<col style="width:50%">
 	<col style="width:10%">
-  <tbody>
     <tr>
       <th>Проект</th>
       <th>Описание проекта</th>
