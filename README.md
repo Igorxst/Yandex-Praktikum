@@ -23,9 +23,9 @@
       <td>Rolls-Royce</td>
     </tr>
     <tr>
-      <tf>Анализ рынка заведений общественного питания Москвы</tf>
-      <tf>Smart</tf>
-      <tf>Rolls-Royce</tf>
+      <td> test</td>
+      <td>tesst</td>
+      <td>test</td>
     </tr>
   </tbody>
 </table>
