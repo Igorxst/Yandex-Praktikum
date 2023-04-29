@@ -13,12 +13,12 @@
       <td>BMW</td>
     </tr>
     <tr>
-      <td>Skoda</td>
+      <td> Исследование данных о российском кинопрокате</td>
       <td>Mercedes-AMG</td>
       <td>Mini</td>
     </tr>
     <tr>
-      <td>Lamborghini</td>
+      <td>Анализ рынка заведений общественного питания Москвы</td>
       <td>Smart</td>
       <td>Rolls-Royce</td>
     </tr>
